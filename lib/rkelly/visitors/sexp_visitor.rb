@@ -373,6 +373,10 @@ module RKelly
         [:attr, o.value]
       end
 
+      def visit_ContextDotNode(o)
+        [:context_dot, o.value]
+      end
+
     end
   end
 end

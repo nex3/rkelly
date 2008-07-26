@@ -68,7 +68,8 @@ edge [ ];
        SourceElements Number LogicalNot AssignExpr FunctionBody Attr
        ObjectLiteral UnaryMinus Throw This BitwiseNot Element String
        Array CaseBlock Null Break Parameter Block False Void Regexp
-       Arguments Attr Continue ConstStatement UnaryPlus VarStatement].each do |node|
+       Arguments Attr ContextDot Continue ConstStatement UnaryPlus
+       VarStatement].each do |node|
       eval "class #{node}Node < Node; end"
     end
   end

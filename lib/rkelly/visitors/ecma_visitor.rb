@@ -312,6 +312,10 @@ module RKelly
         "#{@context}.attr(#{o.value.inspect})"
       end
 
+      def visit_ContextDotNode(o)
+        "#{@context}.#{o.value}"
+      end
+
       private
       def indent; ' ' * @indent * 2; end
     end
