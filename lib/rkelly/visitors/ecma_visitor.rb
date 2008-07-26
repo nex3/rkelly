@@ -1,7 +1,8 @@
 module RKelly
   module Visitors
     class ECMAVisitor < Visitor
-      def initialize
+      def initialize(context)
+        @context = context
         @indent = 0
       end
 
@@ -305,6 +306,10 @@ module RKelly
 
       def visit_NewExprNode(o)
         "new #{o.value.accept(self)}(#{o.arguments.accept(self)})"
+      end
+
+      def visit_AttrNode(o)
+        "#{@context}.attr(#{o.value.inspect})"
       end
 
       private

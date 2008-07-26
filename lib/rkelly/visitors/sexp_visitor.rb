@@ -369,6 +369,10 @@ module RKelly
         [:true]
       end
 
+      def visit_AttrNode(o)
+        [:attr, o.value]
+      end
+
     end
   end
 end

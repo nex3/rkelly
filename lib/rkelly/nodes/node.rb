@@ -29,8 +29,8 @@ module RKelly
         SexpVisitor.new.accept(self)
       end
 
-      def to_ecma
-        ECMAVisitor.new.accept(self)
+      def to_ecma(context)
+        ECMAVisitor.new(context).accept(self)
       end
 
       def to_dots
@@ -58,10 +58,14 @@ edge [ ];
       def each(&block)
         EnumerableVisitor.new(block).accept(self)
       end
+
+      def context_refs
+        select {|n| n.is_a? AttrNode}.size
+      end
     end
 
     %w[EmptyStatement ExpressionStatement True Delete Return TypeOf
-       SourceElements Number LogicalNot AssignExpr FunctionBody
+       SourceElements Number LogicalNot AssignExpr FunctionBody Attr
        ObjectLiteral UnaryMinus Throw This BitwiseNot Element String
        Array CaseBlock Null Break Parameter Block False Void Regexp
        Arguments Attr Continue ConstStatement UnaryPlus VarStatement].each do |node|

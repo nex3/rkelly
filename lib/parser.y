@@ -113,6 +113,7 @@ rule
   | ArrayLiteral
   | IDENT         { result = ResolveNode.new(val.first) }
   | '(' Expr ')'  { result = val[1] }
+  | '@' IDENT     { result = AttrNode.new(val[1]) }
   ;
 
   ArrayLiteral:
