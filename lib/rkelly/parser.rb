@@ -9,6 +9,7 @@ module RKelly
       @tokens = []
       @logger = nil
       @terminator = false
+      @prev_token = nil
     end
 
     # Parse +javascript+ and return an AST
@@ -28,6 +29,7 @@ module RKelly
     end
 
     def next_token
+      @terminator = false
       begin
         return [false, false] if @position >= @tokens.length
         n_token = @tokens[@position]
@@ -36,10 +38,18 @@ module RKelly
         when :COMMENT
           @terminator = true if n_token[1] =~ /^\/\//
         when :S
-          @terminator = true if n_token[1] =~ /^[\r\n]/
+          @terminator = true if n_token[1] =~ /[\r\n]/
         end
       end while([:COMMENT, :S].include?(n_token[0]))
-      n_token
+
+      if @terminator &&
+          ((@prev_token && %w[continue break return throw].include?(@prev_token[1])) ||
+           (n_token && %w[++ --].include?(n_token[1])))
+        @position -= 1
+        return (@prev_token = [';', ';'])
+      end
+
+      @prev_token = n_token
     end
   end
 end
