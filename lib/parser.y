@@ -39,6 +39,11 @@ prechigh
 preclow
 
 rule
+  Expr:
+    AssignmentExpr
+  | Expr ',' AssignmentExpr             { result = CommaNode.new(val[0], val[2]) }
+  ;
+
   SourceElements:
     SourceElement
   | SourceElements SourceElement        { result = val.flatten }
@@ -483,11 +488,6 @@ rule
   | XOREQUAL                            { result = OpXOrEqualNode }
   | OREQUAL                             { result = OpOrEqualNode }
   | MODEQUAL                            { result = OpModEqualNode }
-  ;
-
-  Expr:
-    AssignmentExpr
-  | Expr ',' AssignmentExpr             { result = CommaNode.new(val[0], val[2]) }
   ;
 
   ExprNoIn:
