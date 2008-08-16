@@ -529,14 +529,9 @@ rule
   ;
 
   VariableStatement:
-    VAR VariableDeclarationList ';' {
+    VAR VariableDeclarationList Semi {
       result = VarStatementNode.new(val[1])
       debug(result)
-    }
-  | VAR VariableDeclarationList error {
-      result = VarStatementNode.new(val[1])
-      debug(result)
-      yyabort unless allow_auto_semi?(val.last)
     }
   ;
 
@@ -565,14 +560,9 @@ rule
   ;
 
   ConstStatement:
-    CONST ConstDeclarationList ';' {
+    CONST ConstDeclarationList Semi {
       result = ConstStatementNode.new(val[1])
       debug(result)
-    }
-  | CONST ConstDeclarationList error {
-      result = ConstStatementNode.new(val[1])
-      debug(result)
-      yyerror unless allow_auto_semi?(val.last)
     }
   ;
 
@@ -601,14 +591,9 @@ rule
   ;
 
   ExprStatement:
-    ExprNoBF ';' {
+    ExprNoBF Semi {
       result = ExpressionStatementNode.new(val.first)
       debug(result)
-    }
-  | ExprNoBF error {
-      result = ExpressionStatementNode.new(val.first)
-      debug(result)
-      yyabort unless allow_auto_semi?(val.last)
     }
   ;
 
@@ -624,14 +609,10 @@ rule
   ;
 
   IterationStatement:
-    DO Statement WHILE '(' Expr ')' ';' {
+    DO Statement WHILE '(' Expr ')' Semi {
       result = DoWhileNode.new(val[1], val[4])
       debug(result)
     }
-  | DO Statement WHILE '(' Expr ')' error {
-      result = DoWhileNode.new(val[1], val[4])
-      debug(result)
-    } /* Always performs automatic semicolon insertion. */
   | WHILE '(' Expr ')' Statement {
       result = WhileNode.new(val[2], val[4])
       debug(result)
@@ -674,65 +655,35 @@ rule
   ;
 
   ContinueStatement:
-    CONTINUE ';' {
+    CONTINUE Semi {
       result = ContinueNode.new(nil)
       debug(result)
     }
-  | CONTINUE error {
-      result = ContinueNode.new(nil)
-      debug(result)
-      yyabort unless allow_auto_semi?(val[1])
-    }
-  | CONTINUE IDENT ';' {
+  | CONTINUE IDENT Semi {
       result = ContinueNode.new(val[1])
       debug(result)
-    }
-  | CONTINUE IDENT error {
-      result = ContinueNode.new(val[1])
-      debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
   BreakStatement:
-    BREAK ';' {
+    BREAK Semi {
       result = BreakNode.new(nil)
       debug(result)
     }
-  | BREAK error {
-      result = BreakNode.new(nil)
-      debug(result)
-      yyabort unless allow_auto_semi?(val[1])
-    }
-  | BREAK IDENT ';' {
+  | BREAK IDENT Semi {
       result = BreakNode.new(val[1])
       debug(result)
-    }
-  | BREAK IDENT error {
-      result = BreakNode.new(val[1])
-      debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
   ReturnStatement:
-    RETURN ';' {
+    RETURN Semi {
       result = ReturnNode.new(nil)
       debug(result)
     }
-  | RETURN error {
-      result = ReturnNode.new(nil)
-      debug(result)
-      yyabort unless allow_auto_semi?(val[1])
-    }
-  | RETURN Expr ';' {
+  | RETURN Expr Semi {
       result = ReturnNode.new(val[1])
       debug(result)
-    }
-  | RETURN Expr error {
-      result = ReturnNode.new(val[1])
-      debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
@@ -788,14 +739,9 @@ rule
   ;
 
   ThrowStatement:
-    THROW Expr ';' {
+    THROW Expr Semi {
       result = ThrowNode.new(val[1])
       debug(result)
-    }
-  | THROW Expr error {
-      result = ThrowNode.new(val[1])
-      debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
@@ -815,14 +761,9 @@ rule
   ;
 
   DebuggerStatement:
-    DEBUGGER ';' {
+    DEBUGGER Semi {
       result = EmptyStatementNode.new(val[0])
       debug(result)
-    }
-  | DEBUGGER error {
-      result = EmptyStatementNode.new(val[0])
-      debug(result)
-      yyabort unless allow_auto_semi?(val[1])
     }
   ;
 
@@ -867,6 +808,8 @@ rule
     /* not in spec */           { result = FunctionBodyNode.new(SourceElementsNode.new([])) }
   | SourceElements              { result = FunctionBodyNode.new(SourceElementsNode.new([val[0]].flatten)) }
   ;
+
+  Semi: ';' | error ;
 end
 
 ---- header
@@ -874,10 +817,6 @@ end
 
 ---- inner
   include RKelly::Nodes
-
-  def allow_auto_semi?(error_token)
-    error_token == false || error_token == '}' || @terminator
-  end
 
   def property_class_for(ident)
     case ident

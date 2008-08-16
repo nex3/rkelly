@@ -1,5 +1,6 @@
 require 'rkelly/tokenizer'
 require 'rkelly/generated_parser'
+require 'rkelly/error'
 
 module RKelly
   class Parser < RKelly::GeneratedParser
@@ -20,11 +21,9 @@ module RKelly
     end
 
     private
-    def on_error(error_token_id, error_value, value_stack)
-      if logger
-        logger.error(token_to_str(error_token_id))
-        logger.error("error value: #{error_value}")
-        logger.error("error stack: #{value_stack}")
+    def on_error(token_id, value, value_stack)
+      unless value == false || value == '}' || @terminator
+        raise ParserError.new(token_id, value, token_to_str(token_id))
       end
     end
 
