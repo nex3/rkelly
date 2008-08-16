@@ -3,7 +3,7 @@ module RKelly
     class Visitor
       TERMINAL_NODES = %w{
         Break Continue EmptyStatement False Null Number Parameter Regexp Resolve
-        String This True Attr
+        String This True Attr ContextDot
       }
       SINGLE_VALUE_NODES = %w{
         AssignExpr BitwiseNot Block Delete Element ExpressionStatement

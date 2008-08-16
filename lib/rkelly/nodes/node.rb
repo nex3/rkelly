@@ -60,7 +60,7 @@ edge [ ];
       end
 
       def context_refs
-        select {|n| n.is_a? AttrNode}.size
+        select {|n| n.is_a?(AttrNode) || n.is_a?(ContextDotNode)}.size
       end
     end
 
