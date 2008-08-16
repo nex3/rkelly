@@ -518,7 +518,6 @@ rule
   | VAR VariableDeclarationList error {
       result = VarStatementNode.new(val[1])
       debug(result)
-      yyabort unless allow_auto_semi?(val.last)
     }
   ;
 
@@ -554,7 +553,6 @@ rule
   | CONST ConstDeclarationList error {
       result = ConstStatementNode.new(val[1])
       debug(result)
-      yyerror unless allow_auto_semi?(val.last)
     }
   ;
 
@@ -590,7 +588,6 @@ rule
   | ExprNoBF error {
       result = ExpressionStatementNode.new(val.first)
       debug(result)
-      yyabort unless allow_auto_semi?(val.last)
     }
   ;
 
@@ -663,7 +660,6 @@ rule
   | CONTINUE error {
       result = ContinueNode.new(nil)
       debug(result)
-      yyabort unless allow_auto_semi?(val[1])
     }
   | CONTINUE IDENT ';' {
       result = ContinueNode.new(val[1])
@@ -672,7 +668,6 @@ rule
   | CONTINUE IDENT error {
       result = ContinueNode.new(val[1])
       debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
@@ -684,7 +679,6 @@ rule
   | BREAK error {
       result = BreakNode.new(nil)
       debug(result)
-      yyabort unless allow_auto_semi?(val[1])
     }
   | BREAK IDENT ';' {
       result = BreakNode.new(val[1])
@@ -693,7 +687,6 @@ rule
   | BREAK IDENT error {
       result = BreakNode.new(val[1])
       debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
@@ -705,7 +698,6 @@ rule
   | RETURN error {
       result = ReturnNode.new(nil)
       debug(result)
-      yyabort unless allow_auto_semi?(val[1])
     }
   | RETURN Expr ';' {
       result = ReturnNode.new(val[1])
@@ -714,7 +706,6 @@ rule
   | RETURN Expr error {
       result = ReturnNode.new(val[1])
       debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
@@ -777,7 +768,6 @@ rule
   | THROW Expr error {
       result = ThrowNode.new(val[1])
       debug(result)
-      yyabort unless allow_auto_semi?(val[2])
     }
   ;
 
@@ -804,7 +794,6 @@ rule
   | DEBUGGER error {
       result = EmptyStatementNode.new(val[0])
       debug(result)
-      yyabort unless allow_auto_semi?(val[1])
     }
   ;
 
@@ -856,10 +845,6 @@ end
 
 ---- inner
   include RKelly::Nodes
-
-  def allow_auto_semi?(error_token)
-    error_token == false || error_token == '}' || @terminator
-  end
 
   def property_class_for(ident)
     case ident
