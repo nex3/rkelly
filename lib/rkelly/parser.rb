@@ -13,8 +13,8 @@ module RKelly
     end
 
     # Parse +javascript+ and return an AST
-    def parse(javascript)
-      @tokens = TOKENIZER.tokenize(javascript)
+    def parse(javascript, start = :EXPR)
+      @tokens = [[start, nil]] + TOKENIZER.tokenize(javascript)
       @position = 0
       do_parse
     end

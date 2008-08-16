@@ -33,15 +33,31 @@ token IDENT
 
 token AUTOPLUSPLUS AUTOMINUSMINUS IF_WITHOUT_ELSE
 
+token EXPR LET
+
 prechigh
   nonassoc ELSE
   nonassoc IF_WITHOUT_ELSE
 preclow
 
 rule
+  Start:
+    EXPR Expr { result = val[1]; }
+  | LET LetAssigns { result = val[1]; }
+  ;
+
   Expr:
     AssignmentExpr
   | Expr ',' AssignmentExpr             { result = CommaNode.new(val[0], val[2]) }
+  ;
+
+  LetAssigns:
+    LetAssign { result = val }
+  | LetAssigns ',' LetAssign { result = val[0] + [val[2]] }
+  ;
+
+  LetAssign:
+    IDENT '=' AssignmentExpr { result = [val[0], val[2]] }
   ;
 
   SourceElements:
