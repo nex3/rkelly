@@ -511,11 +511,7 @@ rule
   ;
 
   VariableStatement:
-    VAR VariableDeclarationList ';' {
-      result = VarStatementNode.new(val[1])
-      debug(result)
-    }
-  | VAR VariableDeclarationList error {
+    VAR VariableDeclarationList Semi {
       result = VarStatementNode.new(val[1])
       debug(result)
     }
@@ -546,11 +542,7 @@ rule
   ;
 
   ConstStatement:
-    CONST ConstDeclarationList ';' {
-      result = ConstStatementNode.new(val[1])
-      debug(result)
-    }
-  | CONST ConstDeclarationList error {
+    CONST ConstDeclarationList Semi {
       result = ConstStatementNode.new(val[1])
       debug(result)
     }
@@ -581,11 +573,7 @@ rule
   ;
 
   ExprStatement:
-    ExprNoBF ';' {
-      result = ExpressionStatementNode.new(val.first)
-      debug(result)
-    }
-  | ExprNoBF error {
+    ExprNoBF Semi {
       result = ExpressionStatementNode.new(val.first)
       debug(result)
     }
@@ -603,14 +591,10 @@ rule
   ;
 
   IterationStatement:
-    DO Statement WHILE '(' Expr ')' ';' {
+    DO Statement WHILE '(' Expr ')' Semi {
       result = DoWhileNode.new(val[1], val[4])
       debug(result)
     }
-  | DO Statement WHILE '(' Expr ')' error {
-      result = DoWhileNode.new(val[1], val[4])
-      debug(result)
-    } /* Always performs automatic semicolon insertion. */
   | WHILE '(' Expr ')' Statement {
       result = WhileNode.new(val[2], val[4])
       debug(result)
@@ -653,57 +637,33 @@ rule
   ;
 
   ContinueStatement:
-    CONTINUE ';' {
+    CONTINUE Semi {
       result = ContinueNode.new(nil)
       debug(result)
     }
-  | CONTINUE error {
-      result = ContinueNode.new(nil)
-      debug(result)
-    }
-  | CONTINUE IDENT ';' {
-      result = ContinueNode.new(val[1])
-      debug(result)
-    }
-  | CONTINUE IDENT error {
+  | CONTINUE IDENT Semi {
       result = ContinueNode.new(val[1])
       debug(result)
     }
   ;
 
   BreakStatement:
-    BREAK ';' {
+    BREAK Semi {
       result = BreakNode.new(nil)
       debug(result)
     }
-  | BREAK error {
-      result = BreakNode.new(nil)
-      debug(result)
-    }
-  | BREAK IDENT ';' {
-      result = BreakNode.new(val[1])
-      debug(result)
-    }
-  | BREAK IDENT error {
+  | BREAK IDENT Semi {
       result = BreakNode.new(val[1])
       debug(result)
     }
   ;
 
   ReturnStatement:
-    RETURN ';' {
+    RETURN Semi {
       result = ReturnNode.new(nil)
       debug(result)
     }
-  | RETURN error {
-      result = ReturnNode.new(nil)
-      debug(result)
-    }
-  | RETURN Expr ';' {
-      result = ReturnNode.new(val[1])
-      debug(result)
-    }
-  | RETURN Expr error {
+  | RETURN Expr Semi {
       result = ReturnNode.new(val[1])
       debug(result)
     }
@@ -761,11 +721,7 @@ rule
   ;
 
   ThrowStatement:
-    THROW Expr ';' {
-      result = ThrowNode.new(val[1])
-      debug(result)
-    }
-  | THROW Expr error {
+    THROW Expr Semi {
       result = ThrowNode.new(val[1])
       debug(result)
     }
@@ -787,11 +743,7 @@ rule
   ;
 
   DebuggerStatement:
-    DEBUGGER ';' {
-      result = EmptyStatementNode.new(val[0])
-      debug(result)
-    }
-  | DEBUGGER error {
+    DEBUGGER Semi {
       result = EmptyStatementNode.new(val[0])
       debug(result)
     }
@@ -838,6 +790,8 @@ rule
     /* not in spec */           { result = FunctionBodyNode.new(SourceElementsNode.new([])) }
   | SourceElements              { result = FunctionBodyNode.new(SourceElementsNode.new([val[0]].flatten)) }
   ;
+
+  Semi: ';' | error ;
 end
 
 ---- header
