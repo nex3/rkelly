@@ -33,7 +33,7 @@ token IDENT
 
 token AUTOPLUSPLUS AUTOMINUSMINUS IF_WITHOUT_ELSE
 
-token EXPR LET
+token EXPR LET STMT
 
 prechigh
   nonassoc ELSE
@@ -44,6 +44,7 @@ rule
   Start:
     EXPR Expr { result = val[1]; }
   | LET LetAssigns { result = val[1]; }
+  | STMT ToplevelStatement { result = val[1]; }
   ;
 
   Expr:
@@ -72,22 +73,26 @@ rule
 
   Statement:
     Block
-  | VariableStatement
-  | ConstStatement
   | EmptyStatement
-  | ExprStatement
   | IfStatement
   | IterationStatement
-  | ContinueStatement
-  | BreakStatement
-  | ReturnStatement
   | WithStatement
   | SwitchStatement
   | LabelledStatement
-  | ThrowStatement
   | TryStatement
-  | DebuggerStatement
+  | ToplevelStatement
   ;
+
+  ToplevelStatement:
+    VariableStatement
+  | ConstStatement
+  | ExprStatement
+  | ContinueStatement
+  | BreakStatement
+  | ReturnStatement
+  | ThrowStatement
+  | DebuggerStatement
+  ;  
 
   Literal:
     NULL    { result = NullNode.new(val.first) }
