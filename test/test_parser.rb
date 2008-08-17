@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + "/helper"
 
 class ParserTest < Test::Unit::TestCase
   def setup
-    @parser = RKelly::Parser.new
+    @parser = Jabl::RKelly::Parser.new
   end
 
   def test_array_access

@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + "/helper"
 
 class NodeTestCase < Test::Unit::TestCase
-  include RKelly::Nodes
+  include Jabl::RKelly::Nodes
 
   undef :default_test
 

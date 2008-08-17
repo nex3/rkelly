@@ -1,22 +1,9 @@
 require 'rubygems'
-require 'hoe'
+require 'rake'
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "lib")
 
-require 'rkelly/constants'
-
-GENERATED_PARSER = "lib/rkelly/generated_parser.rb"
-
-Hoe.new('rkelly', RKelly::VERSION) do |p|
-  p.rubyforge_name  = 'rkelly'
-  p.author          = 'Aaron Patterson'
-  p.email           = 'aaronp@rubyforge.org'
-  p.summary         = "RKelly parses JavaScript and returns a parse tree suitable for feeding to Ruby2Ruby."
-  p.description     = p.paragraphs_of('README.txt', 3).join("\n\n")
-  p.url             = p.paragraphs_of('README.txt', 1).first.strip
-  p.changes         = p.paragraphs_of('CHANGELOG.txt', 0..2).join("\n\n")
-  p.clean_globs     = [GENERATED_PARSER]
-end
+GENERATED_PARSER = "lib/jabl-rkelly/generated_parser.rb"
 
 file GENERATED_PARSER => "lib/parser.y" do |t|
   if ENV['DEBUG']
@@ -26,11 +13,49 @@ file GENERATED_PARSER => "lib/parser.y" do |t|
   end
 end
 
+desc "Generate the parser code."
 task :parser => GENERATED_PARSER
 
-# make sure the parser's up-to-date when we test
+# ----- Packaging -----
+
+require 'rake/gempackagetask'
+load    'jabl-rkelly.gemspec'
+
+Rake::GemPackageTask.new(JABL_RKELLY_GEMSPEC) do |pkg|
+  pkg.need_tar_gz = Rake.application.top_level_tasks.include?('release')
+end
+Rake::Task[:package].prerequisites << :parser
+
+desc "Install Jabl::RKelly as a gem."
+task :install => [:package] do
+  sudo = RUBY_PLATFORM =~ /win32/ ? '' : 'sudo'
+  sh %{#{sudo} gem install pkg/jabl-rkelly-#{File.read('VERSION').strip}}
+end
+
+desc "Release a new Jabl:RKelly package to Rubyforge. Requires the NAME and VERSION flags."
+task :release => [:package] do
+  name, version = ENV['NAME'], ENV['VERSION']
+  raise "Must supply NAME and VERSION for release task." unless name && version
+  sh %{rubyforge login}
+  sh %{rubyforge add_release jabl-rkelly jabl-rkelly "#{name} (v#{version})" pkg/jabl-rkelly-#{version}.gem}
+  sh %{rubyforge add_file    jabl-rkelly jabl-rkelly "#{name} (v#{version})" pkg/jabl-rkelly-#{version}.tar.gz}
+end
+
+# ----- Default: Testing ------
+
+task :default => :test
+
+require 'rake/testtask'
+
+Rake::TestTask.new do |t|
+  t.libs << 'lib'
+  test_files = FileList['test/**/test_*.rb']
+  t.test_files = test_files
+  t.verbose = true
+end
 Rake::Task[:test].prerequisites << :parser
-Rake::Task[:check_manifest].prerequisites << :parser
+
+# ----- Misc -----
 
 desc "Create a new node"
 task :new_node do

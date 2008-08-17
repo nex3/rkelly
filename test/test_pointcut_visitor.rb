@@ -1,11 +1,11 @@
 require File.dirname(__FILE__) + "/helper"
 
 class PointcutVisitorTest < Test::Unit::TestCase
-  include RKelly::Visitors
-  include RKelly::Nodes
+  include Jabl::RKelly::Visitors
+  include Jabl::RKelly::Nodes
 
   def setup
-    @parser = RKelly::Parser.new
+    @parser = Jabl::RKelly::Parser.new
   end
 
   def test_visit_NumberNode

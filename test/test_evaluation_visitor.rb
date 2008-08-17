@@ -2,9 +2,9 @@ require File.dirname(__FILE__) + "/helper"
 
 class EvaluationVisitorTest < Test::Unit::TestCase
   def setup
-    @parser = RKelly::Parser.new
-    @scope = RKelly::Runtime::ScopeChain.new
-    @visitor = RKelly::Visitors::EvaluationVisitor.new(@scope)
+    @parser = Jabl::RKelly::Parser.new
+    @scope = Jabl::RKelly::Runtime::ScopeChain.new
+    @visitor = Jabl::RKelly::Visitors::EvaluationVisitor.new(@scope)
   end
 
   def assert_properties(actual, js_code)
