@@ -16,31 +16,6 @@ end
 desc "Generate the parser code."
 task :parser => GENERATED_PARSER
 
-# ----- Packaging -----
-
-require 'rake/gempackagetask'
-load    'jabl-rkelly.gemspec'
-
-Rake::GemPackageTask.new(JABL_RKELLY_GEMSPEC) do |pkg|
-  pkg.need_tar_gz = Rake.application.top_level_tasks.include?('release')
-end
-Rake::Task[:package].prerequisites << :parser
-
-desc "Install Jabl::RKelly as a gem."
-task :install => [:package] do
-  sudo = RUBY_PLATFORM =~ /win32/ ? '' : 'sudo'
-  sh %{#{sudo} gem install pkg/jabl-rkelly-#{File.read('VERSION').strip}}
-end
-
-desc "Release a new Jabl:RKelly package to Rubyforge. Requires the NAME and VERSION flags."
-task :release => [:package] do
-  name, version = ENV['NAME'], ENV['VERSION']
-  raise "Must supply NAME and VERSION for release task." unless name && version
-  sh %{rubyforge login}
-  sh %{rubyforge add_release jabl-rkelly jabl-rkelly "#{name} (v#{version})" pkg/jabl-rkelly-#{version}.gem}
-  sh %{rubyforge add_file    jabl-rkelly jabl-rkelly "#{name} (v#{version})" pkg/jabl-rkelly-#{version}.tar.gz}
-end
-
 # ----- Default: Testing ------
 
 task :default => :test
